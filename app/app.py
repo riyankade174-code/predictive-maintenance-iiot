@@ -3,7 +3,6 @@ import joblib
 import numpy as np
 import pandas as pd
 import os
-# Notun library add kora holo XAI feature-er jonno
 import altair as alt
 
 st.set_page_config(page_title="IIoT Predictive Maintenance", layout="wide")
@@ -11,14 +10,26 @@ st.title("⚙️ Advanced IIoT Predictive Maintenance System with XAI")
 
 @st.cache_resource
 def load_artifacts():
-    # Make sure paths are correct relative to your project structure
     model_path = os.path.join(os.path.dirname(__file__), '../models/random_forest_model.pkl')
     scaler_path = os.path.join(os.path.dirname(__file__), '../models/scaler.pkl')
     return joblib.load(model_path), joblib.load(scaler_path)
 
 model, scaler = load_artifacts()
 
-st.sidebar.header("Industrial Sensor Inputs")
+st.sidebar.header("Industrial Setup & Sensors")
+
+# --- Dynamic Industrial District & Asset Selection ---
+district = st.sidebar.selectbox(
+    "Industrial District / Plant Unit",
+    [
+        "District A - North Hub (Unit-1)",
+        "District B - East Zone (Unit-2)",
+        "District C - West Sector (Unit-3)",
+        "District D - South Plant (Unit-4)"
+    ]
+)
+machine_id = st.sidebar.text_input("Machine / Asset ID", "CNC-Machine-04")
+
 air_temp = st.sidebar.number_input("Air Temperature [K]", 290.0, 310.0, 300.0)
 process_temp = st.sidebar.number_input("Process Temperature [K]", 300.0, 320.0, 310.0)
 speed = st.sidebar.slider("Rotational Speed [rpm]", 1000, 3000, 1500)
@@ -58,6 +69,9 @@ if st.sidebar.button("Run Failure Diagnostics"):
         max_prob = np.max(probs)
     except Exception:
         max_prob = 1.0
+
+    # Display active plant location & asset info
+    st.info(f"📍 **Active District:** {district} &nbsp;&nbsp;|&nbsp;&nbsp; 🔧 **Asset ID:** {machine_id}")
 
     st.subheader("Diagnostic Results")
     col1, col2 = st.columns(2)
@@ -107,7 +121,7 @@ if st.sidebar.button("Run Failure Diagnostics"):
         ),
         tooltip=['Feature', alt.Tooltip('Contribution (%)', format='.1f')]
     ).properties(
-        title='Percentage Contribution of Sensor Inputs to Prediction'
+        title=f'Sensor Contribution Analysis for {machine_id} ({district})'
     ).interactive()
     
     st.altair_chart(bars, use_container_width=True)
