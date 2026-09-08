@@ -32,6 +32,18 @@ plant_location = st.sidebar.selectbox(
     ["Plant A - Unit 1 (Kolkata)", "Plant B - Unit 2 (Durgapur)", "Plant C - Assembly Line 3"]
 )
 
+# Sidebar Visitor Statistics
+st.sidebar.markdown("---")
+st.sidebar.subheader("📊 Visitor Statistics")
+st.sidebar.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="https://api.visitorbadge.io/api/combined?path=predictive-maintenance-iiot&countColor=%23269e2b" alt="Visitor Count"/>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("⚙️ AI4I 2020 Advanced Predictive Maintenance Dashboard")
 st.write(f"Monitoring equipment health and diagnostics for **{plant_location}** using an optimized Random Forest classifier.")
 
@@ -79,7 +91,7 @@ def load_or_train_model():
         smote = SMOTE(random_state=42)
         X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
-        model = RandomForestClassifier(n_estimators=200, max_depth=20, random_state=42, n_jobs=-1)
+        model = RandomForestClassifier(n_estimators=50, max_depth=10, random_state=42, n_jobs=-1)
         model.fit(X_train_resampled, y_train_resampled)
 
         os.makedirs('models', exist_ok=True)
